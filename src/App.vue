@@ -12,6 +12,7 @@
 import { ref } from 'vue';
 import ChatWindow from './components/ChatWindow.vue';
 import ChatInput from './components/ChatInput.vue';
+import {apiCall} from "./api/endpoint.ts";
 
 interface Message {
   role: 'user' | 'bot';
@@ -20,12 +21,17 @@ interface Message {
 
 const messages = ref<Message[]>([]);
 
-function handleSend(message: string) {
+
+async function handleSend(message: string) {
   messages.value.push({ role: 'user', content: message });
-  // Placeholder for API call
-  setTimeout(() => {
-    messages.value.push({ role: 'bot', content: 'Ceci est une réponse fictive.' });
-  }, 500);
+  const botReply = await apiCall();
+  try {
+    setTimeout(() => {
+    messages.value.push({ role: 'bot', content: botReply });
+    }, 500);
+  } catch (error) {
+    messages.value.push({ role: 'bot', content: 'Erreur lors de l’appel à l’API.' });
+  }
 }
 </script>
 
