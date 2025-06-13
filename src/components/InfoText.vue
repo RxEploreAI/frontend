@@ -1,5 +1,5 @@
 <template>
-  <header class="header-glass">
+  <div class="info-text">
     <svg
       class="logo-svg"
       viewBox="0 0 24 24"
@@ -13,46 +13,46 @@
         :fill="logoColor"
       />
     </svg>
-    <span class="logo-text">RxploreAI</span>
-  </header>
+    <h1>All<span>ai</span>tement</h1>
+    <h2>l'IA qui fait couler l'info !</h2>
+  </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from "vue";
-const logoColor = computed(() => "#858d8c");
-</script>
-
 <style scoped>
-.header-glass {
+.info-text {
   width: 100vw;
-  min-width: 100vw;
-  padding: 12px 0 10px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.38);
-  box-shadow: 0 2px 12px 0 rgba(6, 97, 118, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: none;
-  position: sticky;
-  top: 0;
-  left: 0;
-  z-index: 20;
+  max-width: 1000px;
+  margin: 0 auto 12px auto;
+  padding: 10px 0 8px 0;
+  text-align: center;
+  color: #858d8c;
+  font-size: 1.02rem;
+  font-weight: 400;
 }
+
 .logo-svg {
-  height: 1.725em;
-  width: 1.725em;
+  height: 5em;
+  width: 5em;
   margin-right: 10px;
   display: inline-block;
   vertical-align: middle;
+  fill: #a2c1be;
+  margin: 130px 0 0 0;
 }
-.logo-text {
-  font-size: 1.15rem;
+
+h1 {
+  font-size: 6rem;
   font-weight: 600;
-  letter-spacing: 0.03em;
-  color: #858d8c;
-  opacity: 0.95;
-  text-shadow: 0 1px 4px rgba(5, 97, 118, 0.1);
+  margin: 20px 0 0 0;
+}
+
+h1 span {
+  color: #5f6766;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 10px 0 0;
 }
 </style>

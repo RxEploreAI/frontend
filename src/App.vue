@@ -1,6 +1,9 @@
 <template>
   <div class="app-container">
     <Header />
+    <transition name="info-fade">
+      <InfoText v-if="showInfoText" />
+    </transition>
     <div class="chat-area">
       <ChatWindow
         :messages="messages"
@@ -15,49 +18,62 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { useChat } from "@ai-sdk/vue";
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import axios from 'axios';
 import ChatWindow from "./components/ChatWindow.vue";
 import ChatInput from "./components/ChatInput.vue";
 import Header from "./components/Header.vue";
-const url = "https://run.mocky.io/v3/e078ff39-879e-42c7-9a59-3b199f98d89e";
-const { messages, input, handleSubmit, status } = useChat({
-  api: url,
-  initialMessages: [
-    {
-      role: "system",
-      content: "Comment puis-je vous aider aujourd'hui",
-    },
-  ],
-  onFinish(message, info) {
-    console.log("✅ Finished streaming message:", message);
-    console.log("📊 Token usage:", info.usage);
-    console.log("🛑 Finish reason:", info.finishReason);
+import InfoText from "./components/InfoText.vue";
+
+const url = 'http://192.168.70.123:8000/chat';
+
+const messages = ref([
+  {
+    role: 'system',
+    content: "Comment puis-je vous aider aujourd'hui",
   },
-  onError(error) {
-    console.error("❌ An error occurred:", error);
-  },
-  onResponse(response) {
-    console.log("📥 ✅ Received HTTP response from server:", response);
-  },
-});
+]);
+
+const input = ref('');
+const status = ref('ready');
+
+const showInfoText = computed(() => messages.value.length === 1);
 
 async function handleSubmitWithLog() {
+  const question = input.value.trim();
+  if (!question) return;
+  status.value = "submitted";
   messages.value.push({
-    role: "user",
-    content: input.value,
+    role: 'user',
+    content: question,
   });
-
-  // Vide l'input
-  input.value = "";
-
-  const response = await fetch(url);
-  const data = await response.json();
-
-  setTimeout(() => {
-    console.log(data.messages);
-    messages.value.push(...data.messages);
-  }, 500);
+  input.value = '';
+  try {
+    const response = await axios.post(url, {
+      content: question,
+    });
+    console.log('Réponse du backend :', response.data);
+    if (response.data?.messages) {
+      messages.value.push({
+        role: 'assistant',
+        content: response.data.messages[0].content,
+      });
+    } else {
+      messages.value.push({
+        role: 'assistant',
+        content: " Une erreur est servenue.",
+      });
+    }
+  } catch (error) {
+    console.error('Erreur :', error);
+    messages.value.push({
+      role: 'assistant',
+      content: "Une erreur est survenue. Veuillez réessayer.",
+    });
+  } finally {
+    status.value = "ready";
+  }
 }
 </script>
 
@@ -77,7 +93,7 @@ async function handleSubmitWithLog() {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  flex-grow: 1;
+  /* flex-grow: 1; // pour couvrir la zone en hauteur */
   max-height: calc(100vh - 110px); /* header + margin */
   justify-content: flex-end;
   background: rgba(255, 255, 255, 0.25);
@@ -88,6 +104,7 @@ async function handleSubmitWithLog() {
   border: 1px solid rgba(255, 255, 255, 0.18);
   padding: 32px 24px 24px;
   margin: 30px 0;
+  margin-top: auto !important;
   position: relative;
   overflow: hidden;
 }
@@ -102,5 +119,20 @@ h1 {
   .chat-area {
     padding: 16px 12px 12px;
   }
+}
+
+.info-fade-enter-active,
+.info-fade-leave-active {
+  transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.info-fade-enter-from,
+.info-fade-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.info-fade-enter-to,
+.info-fade-leave-from {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>

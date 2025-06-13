@@ -1,34 +1,46 @@
 <template>
-  <div class="chat-window">
+  <div class="chat-window" ref="chatWindowRef">
     <transition-group name="msg-fade" tag="div">
       <div
         v-for="(msg, idx) in messages"
         :key="idx"
-        :class="['message', msg.role]"
+        :class="['message', msg.role, { loading: msg.loading }]"
       >
-        <div v-if="!isLoading">
-          <span class="sender"
-            >{{ msg.role === "user" ? "Vous" : "assistant" }} :</span
-          >
-          {{ msg.content }}
-        </div>
-        <div v-else>
-          <span class="dots-loading"
-            ><span>.</span><span>.</span><span>.</span></span
-          >
-        </div>
+        <span class="sender"
+          >{{ msg.role === "user" ? "Vous" : "Raymond" }} :</span
+        >
+        {{ msg.content }}
       </div>
     </transition-group>
+    <template v-if="isLoading">
+      <span class="dots-loading"
+        ><span>.</span><span>.</span><span>.</span></span
+      >
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from "vue";
+import { defineProps, ref, watch, nextTick } from "vue";
 
-defineProps<{
-  messages: { role: "user" | "assistant"; content: string }[];
-  isLoading: boolean;
-}>();
+interface Message {
+  role: "user" | "bot";
+  content: string;
+  loading?: boolean;
+}
+
+const props = defineProps<{ messages: Message[], isLoading: boolean }>();
+const chatWindowRef = ref<HTMLElement | null>(null);
+
+watch(
+  () => props.messages.length,
+  async () => {
+    await nextTick();
+    if (chatWindowRef.value) {
+      chatWindowRef.value.scrollTop = chatWindowRef.value.scrollHeight;
+    }
+  },
+);
 </script>
 
 <style scoped>
@@ -88,13 +100,11 @@ defineProps<{
 .message.user {
   background: rgba(168, 237, 234, 0.6);
 }
-.message.bot {
+.message.assistant,
+.message.system {
   background: none;
   box-shadow: none;
   backdrop-filter: none;
-}
-.message.bot .sender {
-  display: none;
 }
 .message.loading {
   background: none;
@@ -105,6 +115,7 @@ defineProps<{
   display: inline-block;
   font-size: 1.5em;
   letter-spacing: 2px;
+  padding: 0 18px;
 }
 .dots-loading span {
   opacity: 0.2;
@@ -130,6 +141,7 @@ defineProps<{
   }
 }
 .sender {
+  flex-shrink: 0;
   font-weight: bold;
   margin-right: 8px;
   opacity: 0.6;
