@@ -1,30 +1,63 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="app-container">
+    <h1>Bot Conversationnel</h1>
+    <div class="chat-area">
+      <ChatWindow :messages="messages" />
+      <ChatInput @send="handleSend" />
+    </div>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
+<script lang="ts" setup>
+import { ref } from 'vue';
+import ChatWindow from './components/ChatWindow.vue';
+import ChatInput from './components/ChatInput.vue';
+
+interface Message {
+  role: 'user' | 'bot';
+  content: string;
+}
+
+const messages = ref<Message[]>([]);
+
+function handleSend(message: string) {
+  messages.value.push({ role: 'user', content: message });
+  // Placeholder for API call
+  setTimeout(() => {
+    messages.value.push({ role: 'bot', content: 'Ceci est une réponse fictive.' });
+  }, 500);
+}
+</script>
+
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.chat-area {
+  width: 100%;
+  max-width: 500px;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 32px 24px 16px 24px;
+  margin: 30px 0;
+  position: relative;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+h1 {
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(31, 38, 135, 0.2);
+  margin-bottom: 0;
+  margin-top: 30px;
 }
-</style>
+</style> 
