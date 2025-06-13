@@ -20,7 +20,6 @@ defineProps<{ messages: Message[] }>();
 <style scoped>
 .chat-window {
   flex: 1 1 auto;
-  min-height: 300px;
   overflow-y: auto;
   background: rgba(255,255,255,0.12);
   padding: 16px;
