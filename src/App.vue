@@ -44,10 +44,11 @@ async function handleSend(message: string) {
   background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
 }
 .chat-area {
+  box-sizing: border-box;
   width: 100%;
-  max-width: 500px;
-  min-height: 600px;
+  max-width: 600px;
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   justify-content: flex-end;
   background: rgba(255, 255, 255, 0.25);
@@ -56,7 +57,7 @@ async function handleSend(message: string) {
   -webkit-backdrop-filter: blur(12px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  padding: 32px 24px 16px 24px;
+  padding: 32px 24px 24px;
   margin: 30px 0;
   position: relative;
 }
@@ -65,5 +66,11 @@ h1 {
   text-shadow: 0 2px 8px rgba(31, 38, 135, 0.2);
   margin-bottom: 0;
   margin-top: 30px;
+}
+
+@media (max-width: 600px) {
+  .chat-area {
+    padding: 16px 12px 12px;
+  }
 }
 </style> 

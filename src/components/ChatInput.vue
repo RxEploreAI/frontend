@@ -40,6 +40,7 @@ input[type="text"] {
   border-radius: 12px;
   border: none;
   outline: none;
+  font-family: inherit;
   background: rgba(255,255,255,0.7);
   font-size: 1rem;
   box-shadow: 0 1px 4px 0 rgba(31, 38, 135, 0.06);
