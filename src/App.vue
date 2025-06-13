@@ -2,46 +2,62 @@
   <div class="app-container">
     <Header />
     <div class="chat-area">
-      <ChatWindow :messages="messages" />
-      <ChatInput @send="handleSend" />
+      <ChatWindow
+        :messages="messages"
+        :is-loading="status === 'submitted' || status === 'streaming'"
+      />
+      <ChatInput
+        v-model:input-value="input"
+        :is-loading="status === 'submitted' || status === 'streaming'"
+        @submit="handleSubmitWithLog"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import ChatWindow from './components/ChatWindow.vue';
-import ChatInput from './components/ChatInput.vue';
-import {apiCall} from "./api/endpoint.ts";
-import Header from './components/Header.vue';
+import { useChat } from "@ai-sdk/vue";
+import ChatWindow from "./components/ChatWindow.vue";
+import ChatInput from "./components/ChatInput.vue";
+import Header from "./components/Header.vue";
+const url = "https://run.mocky.io/v3/e078ff39-879e-42c7-9a59-3b199f98d89e";
+const { messages, input, handleSubmit, status } = useChat({
+  api: url,
+  initialMessages: [
+    {
+      role: "system",
+      content: "Comment puis-je vous aider aujourd'hui",
+    },
+  ],
+  onFinish(message, info) {
+    console.log("✅ Finished streaming message:", message);
+    console.log("📊 Token usage:", info.usage);
+    console.log("🛑 Finish reason:", info.finishReason);
+  },
+  onError(error) {
+    console.error("❌ An error occurred:", error);
+  },
+  onResponse(response) {
+    console.log("📥 ✅ Received HTTP response from server:", response);
+  },
+});
 
-interface Message {
-  role: 'user' | 'bot';
-  content: string;
-  loading?: boolean;
-}
+async function handleSubmitWithLog() {
+  messages.value.push({
+    role: "user",
+    content: input.value,
+  });
 
-const messages = ref<Message[]>([]);
+  // Vide l'input
+  input.value = "";
 
-async function handleSend(message: string) {
-  messages.value.push({ role: 'user', content: message });
-  messages.value.push({ role: 'bot', content: '', loading: true });
-  try {
-    const botReply = await apiCall();
-    const idx = messages.value.findIndex(m => m.loading);
-    if (idx !== -1) {
-      messages.value[idx] = { role: 'bot', content: botReply };
-    }
-  } catch (error: any) {
-    let errorMsg = "Erreur lors de l'appel à l'API.";
-    if (error?.response?.status === 500) {
-      errorMsg = "Le serveur a rencontré une erreur (500).";
-    }
-    const idx = messages.value.findIndex(m => m.loading);
-    if (idx !== -1) {
-      messages.value[idx] = { role: 'bot', content: errorMsg };
-    }
-  }
+  const response = await fetch(url);
+  const data = await response.json();
+
+  setTimeout(() => {
+    console.log(data.messages);
+    messages.value.push(...data.messages);
+  }, 500);
 }
 </script>
 
@@ -87,4 +103,4 @@ h1 {
     padding: 16px 12px 12px;
   }
 }
-</style> 
+</style>

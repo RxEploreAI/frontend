@@ -28,6 +28,6 @@
   letter-spacing: 0.03em;
   color: #858d8c;
   opacity: 0.95;
-  text-shadow: 0 1px 4px rgba(5,97,118,0.10);
+  text-shadow: 0 1px 4px rgba(5, 97, 118, 0.1);
 }
-</style> 
+</style>

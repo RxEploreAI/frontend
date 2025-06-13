@@ -1,28 +1,34 @@
 <template>
   <div class="chat-window">
     <transition-group name="msg-fade" tag="div">
-      <div v-for="(msg, idx) in messages" :key="idx" :class="['message', msg.role, { loading: msg.loading }]">
-        <template v-if="msg.loading">
-          <span class="dots-loading"><span>.</span><span>.</span><span>.</span></span>
-        </template>
-        <template v-else>
-          <span class="sender" v-if="msg.role === 'user'">Vous :</span>{{ msg.content }}
-        </template>
+      <div
+        v-for="(msg, idx) in messages"
+        :key="idx"
+        :class="['message', msg.role]"
+      >
+        <div v-if="!isLoading">
+          <span class="sender"
+            >{{ msg.role === "user" ? "Vous" : "assistant" }} :</span
+          >
+          {{ msg.content }}
+        </div>
+        <div v-else>
+          <span class="dots-loading"
+            ><span>.</span><span>.</span><span>.</span></span
+          >
+        </div>
       </div>
     </transition-group>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from 'vue';
+import { defineProps } from "vue";
 
-interface Message {
-  role: 'user' | 'bot';
-  content: string;
-  loading?: boolean;
-}
-
-defineProps<{ messages: Message[] }>();
+defineProps<{
+  messages: { role: "user" | "assistant"; content: string }[];
+  isLoading: boolean;
+}>();
 </script>
 
 <style scoped>
@@ -30,11 +36,11 @@ defineProps<{ messages: Message[] }>();
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
   padding: 16px;
   border-radius: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
+  box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.1);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   display: flex;
@@ -42,7 +48,9 @@ defineProps<{ messages: Message[] }>();
   gap: 8px;
 }
 .msg-fade-enter-active {
-  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .msg-fade-leave-active {
   transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -112,12 +120,18 @@ defineProps<{ messages: Message[] }>();
   animation-delay: 0.4s;
 }
 @keyframes blink {
-  0%, 80%, 100% { opacity: 0.2; }
-  40% { opacity: 1; }
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
 }
 .sender {
   font-weight: bold;
   margin-right: 8px;
   opacity: 0.6;
 }
-</style> 
+</style>
